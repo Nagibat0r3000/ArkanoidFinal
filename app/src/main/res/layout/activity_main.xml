@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rella"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="5"
+        android:textSize="100sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/leftwall"
+        android:layout_width="100dp"
+        android:layout_height="800dp"
+        android:src="@drawable/wall"
+        app:srcCompat="@drawable/wall"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp" />
+
+    <ImageView
+        android:id="@+id/rightwall"
+        android:layout_width="100dp"
+        android:layout_height="800dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/wall"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteY="0dp" />
+
+    <ImageView
+        android:id="@+id/Platforma"
+        android:layout_width="240dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="128dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/leftwall"
+        app:srcCompat="@drawable/platforma"
+        tools:ignore="MissingConstraints" />
+
+    <ImageButton
+        android:id="@+id/leftarrow"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/arrowleft"
+        android:text=""
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:ignore="MissingConstraints"
+
+        tools:layout_editor_absoluteX="0dp" />
+
+    <ImageButton
+        android:id="@+id/rightarrow"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/arrowright"
+        android:text=""
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:ignore="MissingConstraints"
+
+        tools:layout_editor_absoluteX="0dp" />
+
+    <ImageView
+        android:id="@+id/ballid"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        app:layout_constraintBottom_toTopOf="@id/Platforma"
+        app:srcCompat="@drawable/ball"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="350dp"
+        tools:layout_editor_absoluteY="595dp" />
+
+    <ImageView
+        android:id="@+id/a0"
+        android:layout_width="120dp"
+        android:layout_height="60dp"
+        app:srcCompat="@drawable/brick"
+        tools:layout_editor_absoluteX="200dp"
+        tools:layout_editor_absoluteY="70dp"
+        tools:ignore="MissingConstraints" />
+
+    <ImageView
+        android:id="@+id/a1"
+        android:layout_width="120dp"
+        android:layout_height="60dp"
+        app:srcCompat="@drawable/brick"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="361dp"
+        tools:layout_editor_absoluteY="70dp" />
+
+    <ImageView
+        android:id="@+id/a2"
+        android:layout_width="120dp"
+        android:layout_height="60dp"
+        app:srcCompat="@drawable/brick"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="533dp"
+        tools:layout_editor_absoluteY="70dp" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
