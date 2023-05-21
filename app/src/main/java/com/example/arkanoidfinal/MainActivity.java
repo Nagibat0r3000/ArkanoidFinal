@@ -23,8 +23,8 @@ import java.util.TimerTask;
 public class MainActivity extends AppCompatActivity {
     int startchet=4;
     int ballx=15;int bally=-15;
-    int score=0; int level=1;
-    int bricks=81;
+    int score=0; int level=0;
+    int bricks;
     int respawn=0;
     ImageView plat;
     int ballstart;int platstart; int ballstartx;
@@ -68,13 +68,15 @@ public class MainActivity extends AppCompatActivity {
         for(int i =0; i<81;i++){
             int id = getResources().getIdentifier("a" + i, "id", getPackageName());
             bricks1[i] = findViewById(id);
+            bricks1[i].setVisibility(View.INVISIBLE);
         }
         plat = findViewById(R.id.Platforma);
         ImageView wal = findViewById(R.id.leftwall);
         ImageView walr = findViewById(R.id.rightwall);
-         ball = findViewById(R.id.ballid);
+        ball = findViewById(R.id.ballid);
 
         Timer timer = new Timer();
+        nextlevel();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -90,10 +92,8 @@ public class MainActivity extends AppCompatActivity {
                             parent.removeView(textView);
                             ImageView wal = findViewById(R.id.leftwall);
                             ImageView walr = findViewById(R.id.rightwall);
-                            ball.setX(plat.getRight()-150);
                             ballstart=(int)ball.getY();
                             ballstartx = (int)ball.getX();
-                            platstart=(int)plat.getX();
                             //for (int i = 0; i < 81; i++) {
                              //   if(i!=8) {
                              //       bricks1[i].setVisibility(View.INVISIBLE);
@@ -229,19 +229,30 @@ public class MainActivity extends AppCompatActivity {
     }
     public void nextlevel(){
             upal();
-            score+=500;
+            score += 500;
             TextView txt = findViewById(R.id.scoreView);
             txt.setText("Score:\n" + Integer.toString(score));
             level++;
             switch (level){
-                case 2:
+                case 1:
                     for (int i = 0; i < 81; i++) {
-                        if(i%9==0 || i==0)
+                        if(i<63 && i!=0 && i%9!=0 && i%9!=1 && i%9!=7 && i%9!=8)
                         {
                             ImageView img = bricks1[i];
                             img.setVisibility(View.VISIBLE);
+                            bricks++;
                         }
-                        bricks=9;
+                    }
+                    break;
+                case 2:
+                    for (int i = 0; i < 81; i++) {
+                        if( (i>0 && i<9)|| (i>10 && i<18) || (i>20 && i<27) || (i>30 && i<36) || (i>40 && i<45) || (i>50 && i<54)|| (i>60 && i<63) || i==71) {}
+                        else
+                        {
+                            ImageView img = bricks1[i];
+                            img.setVisibility(View.VISIBLE);
+                            bricks++;
+                        }
                     }
                     break;
                 case 3:
@@ -250,8 +261,8 @@ public class MainActivity extends AppCompatActivity {
                         {
                             ImageView img = bricks1[i];
                             img.setVisibility(View.VISIBLE);
+                            bricks++;
                         }
-                        bricks=9;
                     }
                     break;
             }
