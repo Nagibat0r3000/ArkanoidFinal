@@ -12,11 +12,10 @@ import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.os.Looper;
 import android.widget.TextView;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -24,12 +23,13 @@ public class MainActivity extends AppCompatActivity {
     int startchet=4;
     int ballx=15;int bally=-15;
     int score=0; int level=0;
-    int bricks;
+    int bricks; int lives=3;
     int respawn=0;
     ImageView plat;
     int ballstart;int platstart; int ballstartx;
     ImageView ball;Handler handler = new Handler();
     ImageView[] bricks1 = new ImageView[81];
+    int[] brickstatus = new int[82];
 
     Runnable runnable = new Runnable() {
         @Override
@@ -69,12 +69,12 @@ public class MainActivity extends AppCompatActivity {
             int id = getResources().getIdentifier("a" + i, "id", getPackageName());
             bricks1[i] = findViewById(id);
             bricks1[i].setVisibility(View.INVISIBLE);
+            brickstatus[i]=0;
         }
         plat = findViewById(R.id.Platforma);
         ImageView wal = findViewById(R.id.leftwall);
         ImageView walr = findViewById(R.id.rightwall);
         ball = findViewById(R.id.ballid);
-
         Timer timer = new Timer();
         nextlevel();
         timer.schedule(new TimerTask() {
@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
                         bricks1[i].getGlobalVisibleRect(rect2);
 
                         if (Rect.intersects(rect1, rect2)) {
-                            if(img.getVisibility()==View.VISIBLE)
+                            if(img.getVisibility()==View.VISIBLE && brickstatus[i]==1)
                             {
                                 bally=-bally;
                                 score+=100;
@@ -159,8 +159,17 @@ public class MainActivity extends AppCompatActivity {
                                 }
                                 TextView txt = findViewById(R.id.scoreView);
                                 txt.setText("Score:\n" + Integer.toString(score));
+                                img.setVisibility(View.GONE);
                             }
-                            img.setVisibility(View.GONE);
+                            else{
+                                brickstatus[i]--;
+                                if(brickstatus[i]==1)
+                                {
+                                    int id = getResources().getIdentifier("a" + i, "id", getPackageName());
+                                    ImageView iv = findViewById(id);
+                                    //iv.setImage
+                                }
+                            }
                         }
                     }
                     if(ball.getX() <= wal.getRight()) {
@@ -181,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     if(ball.getY()>=plat.getY())
                     {
-                        upal();
+                        upal(0);
                     }
                 }
                 handler12.postDelayed(this, 30);
@@ -190,10 +199,18 @@ public class MainActivity extends AppCompatActivity {
         handler12.postDelayed(runnable12, 30);
 
     }
-    public void upal() {
-        score-=500;
-        TextView txt = findViewById(R.id.scoreView);
-        txt.setText("Score:\n" + Integer.toString(score));
+    public void upal(int a) {
+        if(a!=1){
+            score-=500;
+            lives--;
+            TextView ltxt = findViewById(R.id.livesView);
+            ltxt.setText("Lives:\n" + Integer.toString(lives));
+            TextView txt = findViewById(R.id.scoreView);
+            txt.setText("Score:\n" + Integer.toString(score));
+        }
+        if(lives == 0) {
+            death();
+        }
         respawn=1;
         ConstraintLayout cl = findViewById(R.id.rella);
         ball.setX(ballstartx);ball.setY(ballstart);plat.setX(ball.getLeft()-100);
@@ -228,22 +245,30 @@ public class MainActivity extends AppCompatActivity {
         }.start();
     }
     public void nextlevel(){
-            upal();
-            score += 500;
-            TextView txt = findViewById(R.id.scoreView);
-            txt.setText("Score:\n" + Integer.toString(score));
-            level++;
-            switch (level){
-                case 1:
-                    for (int i = 0; i < 81; i++) {
-                        if(i<63 && i!=0 && i%9!=0 && i%9!=1 && i%9!=7 && i%9!=8)
-                        {
-                            ImageView img = bricks1[i];
-                            img.setVisibility(View.VISIBLE);
-                            bricks++;
-                        }
+        for (int i = 0; i < 81; i++) {
+            bricks1[i].setVisibility(View.GONE);
+        }
+        lives++;
+        TextView ltxt = findViewById(R.id.livesView);
+        ltxt.setText("Lives:\n" + Integer.toString(lives));
+        TextView txt = findViewById(R.id.scoreView);
+        txt.setText("Score:\n" + Integer.toString(score));
+        upal(1);
+        level++;
+        TextView lvltxt = findViewById(R.id.levelView);
+        lvltxt.setText("Level:\n"+Integer.toString(level));
+        switch (level){
+            case 1:
+                for (int i = 0; i < 81; i++) {
+                    if(i<63 && i!=0 && i%9!=0 && i%9!=1 && i%9!=7 && i%9!=8)
+                    {
+                        ImageView img = bricks1[i];
+                        img.setVisibility(View.VISIBLE);
+                        brickstatus[i]=1;
+                        bricks++;
                     }
-                    break;
+                }
+                break;
                 case 2:
                     for (int i = 0; i < 81; i++) {
                         if( (i>0 && i<9)|| (i>10 && i<18) || (i>20 && i<27) || (i>30 && i<36) || (i>40 && i<45) || (i>50 && i<54)|| (i>60 && i<63) || i==71) {}
@@ -251,6 +276,7 @@ public class MainActivity extends AppCompatActivity {
                         {
                             ImageView img = bricks1[i];
                             img.setVisibility(View.VISIBLE);
+                            brickstatus[i]=1;
                             bricks++;
                         }
                     }
@@ -261,10 +287,18 @@ public class MainActivity extends AppCompatActivity {
                         {
                             ImageView img = bricks1[i];
                             img.setVisibility(View.VISIBLE);
+                            brickstatus[i]=1;
                             bricks++;
                         }
                     }
                     break;
             }
+    }
+    public void death()
+    {
+        level=0;
+        score=0;
+        lives=3;
+        nextlevel();
     }
 }
