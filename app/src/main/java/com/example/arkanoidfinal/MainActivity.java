@@ -5,6 +5,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.annotation.SuppressLint;
 import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -23,41 +25,16 @@ public class MainActivity extends AppCompatActivity {
     int startchet=4;
     int ballx=15;int bally=-15;
     int score=0; int level=0;
-    int bricks; int lives=3;
+    int bricks; int lives=2;
+    boolean platdvizl=false;
+    boolean gamestarted=false;
+    boolean platdvizr = false;
     int respawn=0;
     ImageView plat;
     int ballstart;int platstart; int ballstartx;
     ImageView ball;Handler handler = new Handler();
     ImageView[] bricks1 = new ImageView[81];
-    int[] brickstatus = new int[82];
-
-    Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            if(startchet==-1) {
-                int x = (int)plat.getX();
-                if(x>200 && respawn==0) {
-                    plat.setX(x - 15);
-                }
-            }
-            handler.postDelayed(this, 10);
-        }
-    };
-    Handler handler2 = new Handler();
-    Runnable runnable2 = new Runnable() {
-        @Override
-        public void run() {
-            if (startchet == -1 && respawn==0) {
-                int x = (int)plat.getX();
-                if(x<1890) {
-                    plat.setX(x + 15);
-                }
-            }
-            handler2.postDelayed(this, 10);
-        }
-    };
-
-
+    int[] brickstatus = new int[81];
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         //for(int i =0; i<81;i++){
            // int id = getResources().getIdentifier("a" + i, "id", getPackageName());
             //bricks1[i] = findViewById(id);
-            //bricks1[i].setVisibility(View.INVISIBLE);
+            //bricks1[i].setVisibility(View .INVISIBLE);
           //  brickstatus[i]=0;
         //}
         plat = findViewById(R.id.Platforma);
@@ -86,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
                         TextView textView = findViewById(R.id.start);
                         String newText = Integer.toString(startchet);
                         textView.setText(newText);
+                        textView.bringToFront();
                         if (startchet == 0) {
                             timer.cancel();
                             ViewGroup parent = (ViewGroup) textView.getParent();
@@ -112,9 +90,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    handler.postDelayed(runnable, 20);
+                    if(startchet==-1 && respawn==0)
+                    platdvizl=true;
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    handler.removeCallbacks(runnable);
+                    platdvizl=false;
                 }
                 return true;
             }
@@ -124,59 +103,34 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    handler2.postDelayed(runnable2, 20);
+                    if(startchet==-1 && respawn==0)
+                    platdvizr=true;
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    handler2.removeCallbacks(runnable2);
+                    platdvizr=false;
                 }
                 return true;
             }
         });
 
-        Handler handler12 = new Handler();
-        Runnable runnable12 = new Runnable() {
+        Handler handler = new Handler();
+        Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 if(startchet==-1 && respawn==0){
-                    ball.setX(ball.getX() + ballx);
-                    ball.setY(ball.getY() + bally);
-                    for (int i = 0; i < 81; i++) {
-                        if(bricks1!=null)
+                    if(platdvizl)
+                    {
+                        if(plat.getX()>findViewById(R.id.leftwall).getRight())
+                            plat.setX(plat.getX()-15);
+                    }
+                    if(platdvizr)
+                    {
+                        if(plat.getRight()<findViewById(R.id.rightwall).getLeft())
                         {
-                        ImageView img = bricks1[i];
-                        Rect rect1 = new Rect();
-                        ball.getGlobalVisibleRect(rect1);
-
-                        Rect rect2 = new Rect();
-                        bricks1[i].getGlobalVisibleRect(rect2);
-
-                        if (Rect.intersects(rect1, rect2)) {
-                            if(img.getVisibility()==View.VISIBLE && brickstatus[i]==1)
-                            {
-                                bally=-bally;
-                                score+=100;
-                                bricks-=1;
-                                if(bricks==0)
-                                {
-                                    nextlevel();
-                                }
-                                TextView txt = findViewById(R.id.scoreView);
-                                txt.setText("Score:\n" + Integer.toString(score));
-                                img.setVisibility(View.GONE);
-                                ConstraintLayout cnlt = findViewById(R.id.rella);
-                                bricks1[i]=null;
-                                cnlt.removeView(img);
-                            }
-                            else {
-                                brickstatus[i]--;
-                                if (brickstatus[i] == 1) {
-                                    int id = getResources().getIdentifier("a" + i, "id", getPackageName());
-                                    ImageView iv = findViewById(id);
-                                    //iv.setImage
-                                }
-                            }
-                            }
+                            plat.setX(plat.getX()+15);
                         }
                     }
+                    ball.setX(ball.getX() + ballx);
+                    ball.setY(ball.getY() + bally);
                     if(ball.getX() <= wal.getRight()) {
                         ballx = -ballx;
                     }
@@ -187,21 +141,45 @@ public class MainActivity extends AppCompatActivity {
                     if(ball.getY() <= 0) {
                         bally = -bally;
                     }
-                    if(ball.getY() + ball.getHeight() >= plat.getY() && ball.getY() <= plat.getY() + plat.getHeight() && ball.getX() + ball.getWidth() >= plat.getX() && ball.getX() <= plat.getX() + plat.getWidth()) {
-                        bally = -bally;
-                        if (ball.getX() + 80 == plat.getX() || ball.getLeft() == plat.getX() +240) {
-                            ballx=-ballx;
+                    if(ball.getY()>1250) {
+                        if (ball.getY() + ball.getHeight() >= plat.getY() && ball.getY() <= plat.getY() + plat.getHeight() && ball.getX() + ball.getWidth() >= plat.getX() && ball.getX() <= plat.getX() + plat.getWidth()) {
+                            bally = -bally;
+                            if (ball.getX() + 80 == plat.getX() || ball.getLeft() == plat.getX() + 240) {
+                                ballx = -ballx;
+                            }
                         }
                     }
                     if(ball.getY()>=plat.getY())
                     {
                         upal(0);
                     }
+                    Rect bl = new Rect();
+                    ball.getHitRect(bl);
+                    for (int i = 0; i < 81; i++) {
+                        if(bricks1[i]!=null)
+                        {
+                            Rect br = new Rect();
+                            bricks1[i].getHitRect(br);
+                            if(br.intersect(bl))
+                            {
+                                bricks--;
+                                ConstraintLayout cl = findViewById(R.id.rella);
+                                cl.removeView(bricks1[i]);
+                                bricks1[i]=null;
+                                bally=-bally;
+                                score+=100;
+                            }
+                        }
+                    }
+                    if(bricks==0)
+                    {
+                        nextlevel();
+                    }
                 }
-                handler12.postDelayed(this, 30);
+                handler.postDelayed(this, 15);
             }
         };
-        handler12.postDelayed(runnable12, 30);
+        handler.postDelayed(runnable, 1000);
 
     }
     public void upal(int a) {
@@ -216,42 +194,55 @@ public class MainActivity extends AppCompatActivity {
         if(lives == 0) {
             death();
         }
-        respawn=1;
         ConstraintLayout cl = findViewById(R.id.rella);
         ball.setX(ballstartx);ball.setY(ballstart);plat.setX(ball.getLeft()-100);
         ballx=15;bally=-15;
         //  startchet=50;
-        final TextView countdownTextView = new TextView(this);
-        countdownTextView.setText("3");
-        countdownTextView.setTextSize(24);
-        countdownTextView.setId(View.generateViewId());
-
-        ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(
-                ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                ConstraintLayout.LayoutParams.WRAP_CONTENT
-        );
-        params.topToTop = cl.getId();
-        params.bottomToBottom = cl.getId();
-        params.startToStart = cl.getId();
-        params.endToEnd = cl.getId();
-        countdownTextView.setLayoutParams(params);
-
-        cl.addView(countdownTextView);
-
-        new CountDownTimer(3000, 1000) {
-            public void onTick(long millisUntilFinished) {
-                countdownTextView.setText(String.valueOf(millisUntilFinished / 1000 +1));
+        respawn=1;
+        final TextView tmr = new TextView(this);
+            tmr.setText("3");
+            tmr.setTextSize(100);
+            tmr.bringToFront();
+            tmr.setId(View.generateViewId());
+            if(gamestarted==false){
+                tmr.setVisibility(View.GONE);
+                gamestarted=true;
             }
+            ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT
+            );
+            params.topToTop = cl.getId();
+            params.bottomToBottom = cl.getId();
+            params.startToStart = cl.getId();
+            params.endToEnd = cl.getId();
+            tmr.setLayoutParams(params);
+            cl.addView(tmr);
+            new CountDownTimer(3000, 1000) {
+                public void onTick(long millisUntilFinished) {
+                    tmr.setText(String.valueOf(millisUntilFinished / 1000 + 1));
+                }
 
-            public void onFinish() {
-                cl.removeView(countdownTextView);
-                respawn=0;
-            }
-        }.start();
-    }
+                public void onFinish() {
+                    cl.removeView(tmr);
+                    respawn = 0;
+                }
+            }.start();
+        }
     public void nextlevel(){
         for (int i = 0; i < 81; i++) {
-            bricks1[i].setVisibility(View.GONE);
+            bricks1[i]=null;
+            brickstatus[i]=0;
+            bricks=0;
+        }
+        ConstraintLayout cl = findViewById(R.id.rella);
+        for (int i = 0; i < cl.getChildCount(); i++) {
+            View v = cl.getChildAt(i);
+            if(v.getWidth()==200 && v.getHeight()==100)
+            {
+                cl.removeView(v);
+            }
+
         }
         lives++;
         TextView ltxt = findViewById(R.id.livesView);
@@ -262,6 +253,7 @@ public class MainActivity extends AppCompatActivity {
         level++;
         TextView lvltxt = findViewById(R.id.levelView);
         lvltxt.setText("Level:\n"+Integer.toString(level));
+
         switch (level){
             case 1:
                 for (int i = 0; i < 81; i++) {
@@ -284,25 +276,27 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case 3:
                     for (int i = 0; i < 81; i++) {
-                        if(i%9==1 || i==1)
+                        if(i!=19 && i!=25 && i!=28&& i!=34&& i!=37&& i!=43&& i!=46&& i!=52&& i!=55&& i!=61&& i!=10&& i!=11&& i!=12&& i!=13&& i!=14&& i!=15&& i!=16&& i!=64&& i!=65&& i!=66&& i!=67&& i!=68&& i!=69&& i!=70 && i!=30&& i!=31&& i!=32&& i!=39&& i!=41&& i!=48&& i!=49&& i!=50)
                         {
                             brickstatus[i]=1;
                             bricks++;
                         }
                     }
                     break;
-            }
-        for (int i = 0; i < 81; i++) {
-            if(brickstatus[i]>=1)
-            {
+            }for (int i = 0; i < 81; i++) {
+            if (brickstatus[i] >= 1) {
                 ImageView brick = new ImageView(this);
-                brick.setLayoutParams(new ViewGroup.LayoutParams(100, 50));
+                brick.setLayoutParams(new ViewGroup.LayoutParams(200, 100));
                 brick.setImageResource(R.drawable.brick);
                 ConstraintLayout cnlt = findViewById(R.id.rella);
-                brick.setX(105 + 120*(i/9-1));
-                brick.setY(15 + 60*(i%9-1));
+                ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(
+                        ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                        ConstraintLayout.LayoutParams.WRAP_CONTENT
+                );
+                brick.setX(210 + (i%9)*240);
+                brick.setY(30 + (i/9) * 120);
                 cnlt.addView(brick);
-                bricks1[i]=brick;
+                bricks1[i] = brick;
             }
         }
     }
