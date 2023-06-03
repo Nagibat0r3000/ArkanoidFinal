@@ -65,12 +65,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //for (int i = 0; i < 81; i++) {
-        for(int i =0; i<81;i++){
-            int id = getResources().getIdentifier("a" + i, "id", getPackageName());
-            bricks1[i] = findViewById(id);
-            bricks1[i].setVisibility(View.INVISIBLE);
-            brickstatus[i]=0;
-        }
+        //for(int i =0; i<81;i++){
+           // int id = getResources().getIdentifier("a" + i, "id", getPackageName());
+            //bricks1[i] = findViewById(id);
+            //bricks1[i].setVisibility(View.INVISIBLE);
+          //  brickstatus[i]=0;
+        //}
         plat = findViewById(R.id.Platforma);
         ImageView wal = findViewById(R.id.leftwall);
         ImageView walr = findViewById(R.id.rightwall);
@@ -140,6 +140,8 @@ public class MainActivity extends AppCompatActivity {
                     ball.setX(ball.getX() + ballx);
                     ball.setY(ball.getY() + bally);
                     for (int i = 0; i < 81; i++) {
+                        if(bricks1!=null)
+                        {
                         ImageView img = bricks1[i];
                         Rect rect1 = new Rect();
                         ball.getGlobalVisibleRect(rect1);
@@ -160,15 +162,18 @@ public class MainActivity extends AppCompatActivity {
                                 TextView txt = findViewById(R.id.scoreView);
                                 txt.setText("Score:\n" + Integer.toString(score));
                                 img.setVisibility(View.GONE);
+                                ConstraintLayout cnlt = findViewById(R.id.rella);
+                                bricks1[i]=null;
+                                cnlt.removeView(img);
                             }
-                            else{
+                            else {
                                 brickstatus[i]--;
-                                if(brickstatus[i]==1)
-                                {
+                                if (brickstatus[i] == 1) {
                                     int id = getResources().getIdentifier("a" + i, "id", getPackageName());
                                     ImageView iv = findViewById(id);
                                     //iv.setImage
                                 }
+                            }
                             }
                         }
                     }
@@ -262,8 +267,6 @@ public class MainActivity extends AppCompatActivity {
                 for (int i = 0; i < 81; i++) {
                     if(i<63 && i!=0 && i%9!=0 && i%9!=1 && i%9!=7 && i%9!=8)
                     {
-                        ImageView img = bricks1[i];
-                        img.setVisibility(View.VISIBLE);
                         brickstatus[i]=1;
                         bricks++;
                     }
@@ -274,8 +277,6 @@ public class MainActivity extends AppCompatActivity {
                         if( (i>0 && i<9)|| (i>10 && i<18) || (i>20 && i<27) || (i>30 && i<36) || (i>40 && i<45) || (i>50 && i<54)|| (i>60 && i<63) || i==71) {}
                         else
                         {
-                            ImageView img = bricks1[i];
-                            img.setVisibility(View.VISIBLE);
                             brickstatus[i]=1;
                             bricks++;
                         }
@@ -285,14 +286,25 @@ public class MainActivity extends AppCompatActivity {
                     for (int i = 0; i < 81; i++) {
                         if(i%9==1 || i==1)
                         {
-                            ImageView img = bricks1[i];
-                            img.setVisibility(View.VISIBLE);
                             brickstatus[i]=1;
                             bricks++;
                         }
                     }
                     break;
             }
+        for (int i = 0; i < 81; i++) {
+            if(brickstatus[i]>=1)
+            {
+                ImageView brick = new ImageView(this);
+                brick.setLayoutParams(new ViewGroup.LayoutParams(100, 50));
+                brick.setImageResource(R.drawable.brick);
+                ConstraintLayout cnlt = findViewById(R.id.rella);
+                brick.setX(105 + 120*(i/9-1));
+                brick.setY(15 + 60*(i%9-1));
+                cnlt.addView(brick);
+                bricks1[i]=brick;
+            }
+        }
     }
     public void death()
     {
